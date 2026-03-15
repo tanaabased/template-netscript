@@ -7,7 +7,8 @@ no-argument flow and verifies the placeholder output from the prepared `dist/scr
 
 ```powershell
 # should run the default placeholder flow
-& script.ps1 | Set-Content -Path run.log
+$output = & script.ps1
+$output | Set-Content -Path run.log
 ```
 
 ## Testing
