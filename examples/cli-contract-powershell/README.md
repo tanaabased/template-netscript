@@ -7,28 +7,26 @@ output, and a clear failure for unexpected positional arguments.
 
 ```powershell
 # should show the debug flag in help output
-script.ps1 -Help | Select-String -Pattern '-Debug'
+& script.ps1 -Help | Select-String -Pattern '-Debug'
 
 # should show the version flag in help output
-script.ps1 -Help | Select-String -Pattern '-Version'
+& script.ps1 -Help | Select-String -Pattern '-Version'
 
 # should print a version string
-$version = script.ps1 -Version
+$version = & script.ps1 -Version
 if ([string]::IsNullOrWhiteSpace($version)) { throw 'expected version output' }
 
 # should fail for an unexpected positional argument
-$stderrPath = 'invalid.err.log'
-$stdoutPath = 'invalid.out.log'
 $succeeded = $true
 try {
-  script.ps1 definitely-bogus 1> $stdoutPath 2> $stderrPath
+  & script.ps1 definitely-bogus 1> invalid.out.log 2> invalid.err.log
 } catch {
   $succeeded = $false
 }
 if ($succeeded) { throw 'expected script.ps1 definitely-bogus to fail' }
 
 # should explain the positional argument failure
-Get-Content $stderrPath | Select-String -Pattern 'does not accept positional arguments yet'
+Get-Content invalid.err.log | Select-String -Pattern 'does not accept positional arguments yet'
 ```
 
 ## Destroy tests
