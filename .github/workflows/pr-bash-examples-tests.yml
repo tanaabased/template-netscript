@@ -6,6 +6,9 @@ on:
 permissions:
   contents: read
 
+env:
+  STAMPED_VERSION: v9.9.9-ci.${{ github.event.pull_request.head.sha }}
+
 jobs:
   examples:
     name: ${{ matrix.runs-on }} / ${{ matrix.example }}
@@ -38,15 +41,17 @@ jobs:
           sync: false
           commands: |
             bun run build
-            version-injector dist/script.sh --style sh --version "$PREPARE_RELEASE_VERSION"
-            version-injector dist/script.ps1 --style ps1 --version "$PREPARE_RELEASE_VERSION"
+            version-injector dist/script.sh --style sh --version "${{ env.STAMPED_VERSION }}"
+            version-injector dist/script.ps1 --style ps1 --version "${{ env.STAMPED_VERSION }}"
 
       - name: Put prepared script on PATH
         shell: bash
         run: echo "$PWD/dist" >> "$GITHUB_PATH"
 
-      - name: Run Leia-backed example
+      - name: Verify example ${{ matrix.example }} with Leia
         shell: bash
+        env:
+          TMPDIR: ${{ github.workspace }}/examples/${{ matrix.example }}/.tmp
         run: |
-          mkdir -p examples/.tmp
-          TMPDIR="$PWD/examples/.tmp" ./node_modules/.bin/leia "examples/${{ matrix.example }}/README.md" -c "Destroy tests" --stdin
+          mkdir -p "$TMPDIR"
+          bun run leia "examples/${{ matrix.example }}/README.md" -c "Destroy tests" --stdin

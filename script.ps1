@@ -17,8 +17,8 @@ $env:DEBUG = '1'
 
 Run `./script.ps1 -Help` for more advanced usage.
 #>
+[CmdletBinding()]
 param(
-  [switch]$Debug,
   [switch]$Help,
   [switch]$Version,
 
@@ -31,9 +31,10 @@ $ErrorActionPreference = 'Stop'
 
 $CLI_NAME = if ($PSCommandPath) { Split-Path -Leaf $PSCommandPath } else { $MyInvocation.MyCommand.Name }
 # Keep a single top-level assignment so release automation can stamp the entrypoint in place.
-$SCRIPT_VERSION = $null
+$SCRIPT_VERSION = if (-not [string]::IsNullOrWhiteSpace($env:SCRIPT_VERSION)) { $env:SCRIPT_VERSION } else { try { $resolved = (& git describe --tags --always --abbrev=1 2>$null | Out-String).Trim(); if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($resolved)) { $resolved } else { '0.0.0-dev' } } catch { '0.0.0-dev' } }
 $ESCAPE = [char]27
 $USE_COLOR = $false
+$script:DebugEnabled = $false
 
 function Test-Truthy {
   param([AllowNull()][object]$Value)
@@ -53,22 +54,19 @@ function Test-Truthy {
   }
 }
 
-function Get-ScriptVersion {
-  try {
-    $output = & git describe --tags --always --abbrev=1 2>$null
-    if ($LASTEXITCODE -ne 0) {
-      return '0.0.0-dev'
-    }
+# Normalize debug preference using the common -Debug parameter plus env fallbacks.
+$DebugPreference = if (
+  $PSBoundParameters.ContainsKey('Debug') -or
+  (Test-Truthy $env:DEBUG) -or
+  (Test-Truthy $env:RUNNER_DEBUG)
+) {
+  'Continue'
+} else {
+  $DebugPreference
+}
 
-    $resolved = ($output | Out-String).Trim()
-    if ([string]::IsNullOrWhiteSpace($resolved)) {
-      return '0.0.0-dev'
-    }
-
-    return $resolved
-  } catch {
-    return '0.0.0-dev'
-  }
+if ($DebugPreference -eq 'Inquire' -or $DebugPreference -eq 'Continue') {
+  $script:DebugEnabled = $true
 }
 
 function Test-ColorEnabled {
@@ -153,25 +151,8 @@ function Expand-Message {
   return $normalized
 }
 
-function Write-StreamLine {
+function Write-Status {
   param(
-    [ValidateSet('stdout', 'stderr')]
-    [string]$Stream = 'stdout',
-    [string]$Message = ''
-  )
-
-  if ($Stream -eq 'stderr') {
-    [Console]::Error.WriteLine($Message)
-    return
-  }
-
-  [Console]::Out.WriteLine($Message)
-}
-
-function Write-StatusLine {
-  param(
-    [ValidateSet('stdout', 'stderr')]
-    [string]$Stream,
     [string]$Label,
     [scriptblock]$Colorizer,
     [AllowNull()][object]$Message = '',
@@ -179,7 +160,7 @@ function Write-StatusLine {
   )
 
   $text = Expand-Message -Message $Message -MessageArgs $MessageArgs
-  Write-StreamLine -Stream $Stream -Message ('{0}: {1}' -f (& $Colorizer $Label), $text)
+  Write-Information ('{0}: {1}' -f (& $Colorizer $Label), $text) -InformationAction Continue
 }
 
 function debug {
@@ -188,12 +169,20 @@ function debug {
     [object[]]$MessageArgs = @()
   )
 
-  if (-not $script:Resolved.Debug) {
+  if (-not $script:DebugEnabled) {
     return
   }
 
-  $text = Expand-Message -Message $Message -MessageArgs $MessageArgs
-  Write-StreamLine -Stream 'stderr' -Message ('{0} {1}' -f (dim 'debug'), $text)
+  Write-Debug (Expand-Message -Message $Message -MessageArgs $MessageArgs)
+}
+
+function log {
+  param(
+    [AllowNull()][object]$Message = '',
+    [object[]]$MessageArgs = @()
+  )
+
+  Write-Output (Expand-Message -Message $Message -MessageArgs $MessageArgs)
 }
 
 function note {
@@ -202,29 +191,20 @@ function note {
     [object[]]$MessageArgs = @()
   )
 
-  Write-StatusLine -Stream 'stdout' -Label 'note' -Colorizer ${function:ts} -Message $Message -MessageArgs $MessageArgs
+  Write-Status -Label 'note' -Colorizer ${function:ts} -Message $Message -MessageArgs $MessageArgs
 }
 
 function fail {
   param(
-    [string]$Message,
-    [int]$ExitCode = 1
+    [string]$Message
   )
 
-  Write-StatusLine -Stream 'stderr' -Label 'error' -Colorizer ${function:red} -Message $Message
-  throw ([System.Exception]::new(('exit {0}: {1}' -f $ExitCode, $Message)))
-}
-
-function Resolve-Debug {
-  if ($PSBoundParameters.ContainsKey('Debug')) {
-    return [bool]$Debug
-  }
-
-  return (Test-Truthy $env:DEBUG) -or (Test-Truthy $env:RUNNER_DEBUG)
+  $text = Expand-Message -Message $Message
+  Write-Error -Message ('error: {0}' -f $text) -ErrorAction Stop
 }
 
 function Show-Version {
-  Write-StreamLine -Stream 'stdout' -Message $script:SCRIPT_VERSION
+  Write-Output $script:SCRIPT_VERSION
 }
 
 function Show-Usage {
@@ -243,30 +223,26 @@ function Show-Usage {
     '  -Help     show this help message'
     ''
     'This starter intentionally has no product logic yet.'
+    'Additional arguments are ignored by the starter until you replace the placeholder logic.'
     ('Replace the body of {0} with your project behavior.' -f $script:CLI_NAME)
   )
 
-  Write-StreamLine -Stream 'stdout' -Message ($lines -join [Environment]::NewLine)
+  Write-Output ($lines -join [Environment]::NewLine)
 }
 
 function Invoke-RunCli {
   if ($script:Resolved.Positionals.Count -gt 0) {
-    $joined = ($script:Resolved.Positionals -join ' ')
-    fail ('This starter does not accept positional arguments yet: {0}.' -f (bold $joined))
+    debug 'ignoring starter positional arguments: {0}' ($script:Resolved.Positionals -join ' ')
   }
 
   debug 'running placeholder command body'
-  note 'Replace the body of {0} with your project logic.' $script:CLI_NAME
+  log 'Replace the body of {0} with your project logic.' $script:CLI_NAME
 }
 
 $script:USE_COLOR = Test-ColorEnabled
 
-if (-not $SCRIPT_VERSION) {
-  $SCRIPT_VERSION = Get-ScriptVersion
-}
-
 $script:Resolved = [pscustomobject]@{
-  Debug = Resolve-Debug
+  Debug = $script:DebugEnabled
   Positionals = @($Positionals)
 }
 

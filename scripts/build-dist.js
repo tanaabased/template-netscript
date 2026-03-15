@@ -7,7 +7,7 @@ const execFileAsync = promisify(execFile);
 const DIST_URL = new URL('../dist/', import.meta.url);
 const REPO_URL = new URL('../', import.meta.url);
 const REPO_ROOT = fileURLToPath(REPO_URL);
-const PUBLIC_ORIGIN = 'https://script.example.com';
+const PUBLIC_ORIGIN = 'https://script.tanaab.sh';
 const PUBLISHED_SCRIPTS = [
   {
     sourcePath: 'script.sh',
