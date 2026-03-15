@@ -89,6 +89,9 @@ If you are using this repository as a GitHub template, the adoption flow is:
 4. Replace the placeholder origin `https://script.tanaab.sh`.
 5. Run the local checks before pushing.
 
+See [`TEMPLATE-SETUP.md`](./TEMPLATE-SETUP.md) for the fuller agent-driven post-fork setup flow and
+manual adoption checklist.
+
 ## Development
 
 `template-netscript` uses Bun for repo-local tooling and treats `dist/` as a tracked, Netlify-ready
