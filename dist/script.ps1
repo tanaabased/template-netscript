@@ -151,25 +151,8 @@ function Expand-Message {
   return $normalized
 }
 
-function Write-StreamLine {
+function Write-Status {
   param(
-    [ValidateSet('stdout', 'stderr')]
-    [string]$Stream = 'stdout',
-    [string]$Message = ''
-  )
-
-  if ($Stream -eq 'stderr') {
-    [Console]::Error.WriteLine($Message)
-    return
-  }
-
-  [Console]::Out.WriteLine($Message)
-}
-
-function Write-StatusLine {
-  param(
-    [ValidateSet('stdout', 'stderr')]
-    [string]$Stream,
     [string]$Label,
     [scriptblock]$Colorizer,
     [AllowNull()][object]$Message = '',
@@ -177,7 +160,7 @@ function Write-StatusLine {
   )
 
   $text = Expand-Message -Message $Message -MessageArgs $MessageArgs
-  Write-StreamLine -Stream $Stream -Message ('{0}: {1}' -f (& $Colorizer $Label), $text)
+  Write-Host ('{0}: {1}' -f (& $Colorizer $Label), $text)
 }
 
 function debug {
@@ -190,8 +173,16 @@ function debug {
     return
   }
 
-  $text = Expand-Message -Message $Message -MessageArgs $MessageArgs
-  Write-StreamLine -Stream 'stderr' -Message ('{0} {1}' -f (dim 'debug'), $text)
+  Write-Debug (Expand-Message -Message $Message -MessageArgs $MessageArgs)
+}
+
+function log {
+  param(
+    [AllowNull()][object]$Message = '',
+    [object[]]$MessageArgs = @()
+  )
+
+  Write-Output (Expand-Message -Message $Message -MessageArgs $MessageArgs)
 }
 
 function note {
@@ -200,7 +191,7 @@ function note {
     [object[]]$MessageArgs = @()
   )
 
-  Write-StatusLine -Stream 'stdout' -Label 'note' -Colorizer ${function:ts} -Message $Message -MessageArgs $MessageArgs
+  Write-Status -Label 'note' -Colorizer ${function:ts} -Message $Message -MessageArgs $MessageArgs
 }
 
 function fail {
@@ -209,12 +200,12 @@ function fail {
     [int]$ExitCode = 1
   )
 
-  Write-StatusLine -Stream 'stderr' -Label 'error' -Colorizer ${function:red} -Message $Message
-  throw ([System.Exception]::new(('exit {0}: {1}' -f $ExitCode, $Message)))
+  $text = Expand-Message -Message $Message
+  Write-Error -Message ('error: {0}' -f $text) -ErrorAction Stop
 }
 
 function Show-Version {
-  Write-StreamLine -Stream 'stdout' -Message $script:SCRIPT_VERSION
+  Write-Output $script:SCRIPT_VERSION
 }
 
 function Show-Usage {
@@ -236,7 +227,7 @@ function Show-Usage {
     ('Replace the body of {0} with your project behavior.' -f $script:CLI_NAME)
   )
 
-  Write-StreamLine -Stream 'stdout' -Message ($lines -join [Environment]::NewLine)
+  Write-Output ($lines -join [Environment]::NewLine)
 }
 
 function Invoke-RunCli {
@@ -246,7 +237,7 @@ function Invoke-RunCli {
   }
 
   debug 'running placeholder command body'
-  note 'Replace the body of {0} with your project logic.' $script:CLI_NAME
+  log 'Replace the body of {0} with your project logic.' $script:CLI_NAME
 }
 
 $script:USE_COLOR = Test-ColorEnabled
