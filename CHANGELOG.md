@@ -1,5 +1,7 @@
 ## {{ UNRELEASED_VERSION }} - [{{ UNRELEASED_DATE }}]({{ UNRELEASED_LINK }})
 
+## v1.0.0-beta.1 - [March 15, 2026](https://github.com/tanaabased/template-netscript/releases/tag/v1.0.0-beta.1)
+
 - Added [TEMPLATE-SETUP.md](./TEMPLATE-SETUP.md) as the agent-driven template adoption and seeding spec, including a copy-paste prompt plus cleanup and changelog-reset rules.
 - Added Bash and PowerShell starter entrypoints at repo root for hosted script repositories on macOS, Linux, and Windows.
 - Added CI linting for the maintained shell surfaces with `shellcheck` for Bash and `PSScriptAnalyzer` for PowerShell.

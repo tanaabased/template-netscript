@@ -2,13 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://script.tanaab.sh/script.sh</loc>
-    <lastmod>2026-03-15T20:11:15.000Z</lastmod>
+    <lastmod>2026-03-15T20:51:26.000Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://script.tanaab.sh/script.ps1</loc>
-    <lastmod>2026-03-15T20:11:15.000Z</lastmod>
+    <lastmod>2026-03-15T20:51:26.000Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
   </url>

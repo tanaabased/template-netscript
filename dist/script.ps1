@@ -31,7 +31,7 @@ $ErrorActionPreference = 'Stop'
 
 $CLI_NAME = if ($PSCommandPath) { Split-Path -Leaf $PSCommandPath } else { $MyInvocation.MyCommand.Name }
 # Keep a single top-level assignment so release automation can stamp the entrypoint in place.
-$SCRIPT_VERSION = if (-not [string]::IsNullOrWhiteSpace($env:SCRIPT_VERSION)) { $env:SCRIPT_VERSION } else { try { $resolved = (& git describe --tags --always --abbrev=1 2>$null | Out-String).Trim(); if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($resolved)) { $resolved } else { '0.0.0-dev' } } catch { '0.0.0-dev' } }
+$SCRIPT_VERSION = "v1.0.0-beta.1"
 $ESCAPE = [char]27
 $USE_COLOR = $false
 $script:DebugEnabled = $false
