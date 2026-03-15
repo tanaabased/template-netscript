@@ -10,24 +10,24 @@ Netlify serves.
 ## Quickstart
 
 ```sh
-curl -fsSL https://script.example.com/script.sh | bash
+curl -fsSL https://script.tanaab.sh/script.sh | bash
 ```
 
 ```powershell
-irm https://script.example.com/script.ps1 | iex
+irm https://script.tanaab.sh/script.ps1 | iex
 ```
 
 ## Installation
 
-`template-netscript` is designed around hosted raw scripts at `https://script.example.com/script.sh`
-and `https://script.example.com/script.ps1`.
+`template-netscript` is designed around hosted raw scripts at `https://script.tanaab.sh/script.sh`
+and `https://script.tanaab.sh/script.ps1`.
 
 - The Bash path requires Bash and cURL.
 - The PowerShell path requires PowerShell.
 - The hosted URLs serve the generated `dist/script.sh` and `dist/script.ps1` entrypoints used for
   release-shaped validation and Netlify publishing.
 - In a repository created from this template, replace `script.sh`, `script.ps1`, and
-  `https://script.example.com` before publishing.
+  `https://script.tanaab.sh` before publishing.
 
 ## Usage
 
@@ -64,7 +64,7 @@ a directory that is already in your `PATH` or one you manage yourself.
 
 ```sh
 mkdir -p "$HOME/.local/bin"
-curl -fsSL https://script.example.com/script.sh -o "$HOME/.local/bin/script"
+curl -fsSL https://script.tanaab.sh/script.sh -o "$HOME/.local/bin/script"
 chmod +x "$HOME/.local/bin/script"
 
 script --help
@@ -74,7 +74,7 @@ script --version
 ```powershell
 $target = Join-Path $HOME 'bin\script.ps1'
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $target) | Out-Null
-Invoke-WebRequest https://script.example.com/script.ps1 -OutFile $target
+Invoke-WebRequest https://script.tanaab.sh/script.ps1 -OutFile $target
 
 & $target -Help
 & $target -Version
@@ -86,7 +86,7 @@ If you are using this repository as a GitHub template, the adoption flow is:
 2. Rename `script.sh` and `script.ps1`, then update the same paths in `README.md`, `scripts/build-dist.js`,
    `site/index.html`, `netlify.toml`, `examples/`, and `.github/workflows/`.
 3. Replace the placeholder command bodies in `script.sh` and `script.ps1`.
-4. Replace the placeholder origin `https://script.example.com`.
+4. Replace the placeholder origin `https://script.tanaab.sh`.
 5. Run the local checks before pushing.
 
 ## Development
