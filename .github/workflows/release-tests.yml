@@ -6,6 +6,9 @@ on:
 permissions:
   contents: read
 
+env:
+  STAMPED_VERSION: v9.9.9-ci.${{ github.event.pull_request.head.sha }}
+
 jobs:
   release-bash:
     runs-on: ubuntu-24.04
@@ -24,7 +27,6 @@ jobs:
         run: bun install --frozen-lockfile --ignore-scripts
 
       - name: Prepare release-shaped build
-        id: prepare-release
         uses: tanaabased/prepare-release-action@v1
         with:
           version: dev
@@ -32,15 +34,15 @@ jobs:
           commands: |
             bun run lint
             bun run build
-            version-injector dist/script.sh --style sh --version "$PREPARE_RELEASE_VERSION"
-            version-injector dist/script.ps1 --style ps1 --version "$PREPARE_RELEASE_VERSION"
+            version-injector dist/script.sh --style sh --version "${{ env.STAMPED_VERSION }}"
+            version-injector dist/script.ps1 --style ps1 --version "${{ env.STAMPED_VERSION }}"
 
       - name: Verify stamped release entrypoint
         shell: bash
         run: |
           actual="$(bash ./dist/script.sh --version)"
           printf 'actual=%s\n' "$actual"
-          test "$actual" = "${{ steps.prepare-release.outputs.resolved-version }}"
+          test "$actual" = "${{ env.STAMPED_VERSION }}"
 
   release-powershell:
     runs-on: windows-2025
@@ -59,20 +61,19 @@ jobs:
         run: bun install --frozen-lockfile --ignore-scripts
 
       - name: Prepare release-shaped build
-        id: prepare-release
         uses: tanaabased/prepare-release-action@v1
         with:
           version: dev
           sync: false
           commands: |
             bun run build
-            version-injector dist/script.sh --style sh --version "$PREPARE_RELEASE_VERSION"
-            version-injector dist/script.ps1 --style ps1 --version "$PREPARE_RELEASE_VERSION"
+            version-injector dist/script.sh --style sh --version "${{ env.STAMPED_VERSION }}"
+            version-injector dist/script.ps1 --style ps1 --version "${{ env.STAMPED_VERSION }}"
 
       - name: Verify stamped PowerShell release entrypoint
         shell: pwsh
         run: |
           $version = & ./dist/script.ps1 -Version
-          if ($version -ne "${{ steps.prepare-release.outputs.resolved-version }}") {
-            throw "expected version ${{ steps.prepare-release.outputs.resolved-version }}, got $version"
+          if ($version -ne "${{ env.STAMPED_VERSION }}") {
+            throw "expected version ${{ env.STAMPED_VERSION }}, got $version"
           }

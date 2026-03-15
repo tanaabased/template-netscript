@@ -6,6 +6,9 @@ on:
 permissions:
   contents: read
 
+env:
+  STAMPED_VERSION: v9.9.9-ci.${{ github.event.pull_request.head.sha }}
+
 jobs:
   examples:
     name: windows-2025 / ${{ matrix.example }}
@@ -35,8 +38,8 @@ jobs:
           sync: false
           commands: |
             bun run build
-            version-injector dist/script.sh --style sh --version "$PREPARE_RELEASE_VERSION"
-            version-injector dist/script.ps1 --style ps1 --version "$PREPARE_RELEASE_VERSION"
+            version-injector dist/script.sh --style sh --version "${{ env.STAMPED_VERSION }}"
+            version-injector dist/script.ps1 --style ps1 --version "${{ env.STAMPED_VERSION }}"
 
       - name: Put prepared scripts on PATH
         shell: pwsh
