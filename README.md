@@ -6,6 +6,10 @@ Bash and PowerShell scripts. The primary entrypoints live at repo root, support 
 Netlify serves.
 
 > Supports Bash on macOS and Linux plus PowerShell on Windows.
+>
+> If you are adopting this repository as a template, start with
+> [`TEMPLATE-SETUP.md`](./TEMPLATE-SETUP.md). It is the agent-driven setup spec and manual
+> post-fork checklist.
 
 ## Quickstart
 
@@ -88,9 +92,6 @@ If you are using this repository as a GitHub template, the adoption flow is:
 3. Replace the placeholder command bodies in `script.sh` and `script.ps1`.
 4. Replace the placeholder origin `https://script.tanaab.sh`.
 5. Run the local checks before pushing.
-
-See [`TEMPLATE-SETUP.md`](./TEMPLATE-SETUP.md) for the fuller agent-driven post-fork setup flow and
-manual adoption checklist.
 
 ## Development
 
