@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+temp
+cache
+.tmp
+.netlify
+reports
+_site
+.vitepress/cache
+.vitepress/dist
+bun.lock

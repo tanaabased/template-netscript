@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content="0; url=/script.sh" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hosted Script Starter</title>
+    <script>
+      const TARGETS = {
+        default: '/script.sh',
+        windows: '/script.ps1',
+      };
+
+      function getRedirectTarget(userAgent) {
+        if (/Windows Phone|Windows Mobile|Windows/i.test(userAgent)) {
+          return TARGETS.windows;
+        }
+
+        return TARGETS.default;
+      }
+
+      const redirectTarget = getRedirectTarget(window.navigator.userAgent);
+      window.location.replace(new URL(redirectTarget, window.location.origin).toString());
+    </script>
+  </head>
+  <body>
+    <p>
+      Redirecting to <a href="/script.sh">/script.sh</a> or <a href="/script.ps1">/script.ps1</a>.
+    </p>
+  </body>
+</html>

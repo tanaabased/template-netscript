@@ -1,0 +1,52 @@
+name: Bash Examples Tests
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  examples:
+    name: ${{ matrix.runs-on }} / ${{ matrix.example }}
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on:
+          - ubuntu-24.04
+          - macos-26
+        example:
+          - cli-contract-bash
+          - minimal-bash
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Prepare release-shaped build
+        uses: tanaabased/prepare-release-action@v1
+        with:
+          version: dev
+          sync: false
+          commands: |
+            bun run build
+            version-injector dist/script.sh --style sh --version "$PREPARE_RELEASE_VERSION"
+            version-injector dist/script.ps1 --style ps1 --version "$PREPARE_RELEASE_VERSION"
+
+      - name: Put prepared script on PATH
+        shell: bash
+        run: echo "$PWD/dist" >> "$GITHUB_PATH"
+
+      - name: Run Leia-backed example
+        shell: bash
+        run: |
+          mkdir -p examples/.tmp
+          TMPDIR="$PWD/examples/.tmp" ./node_modules/.bin/leia "examples/${{ matrix.example }}/README.md" -c "Destroy tests" --stdin
