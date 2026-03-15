@@ -45,8 +45,12 @@ jobs:
         shell: pwsh
         run: '"{0}\dist" -f $PWD | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append'
 
-      - name: Run Leia-backed example
+      - name: Verify example ${{ matrix.example }} with Leia
         shell: pwsh
+        env:
+          TMPDIR: ${{ github.workspace }}\examples\${{ matrix.example }}\.tmp
+          TMP: ${{ github.workspace }}\examples\${{ matrix.example }}\.tmp
+          TEMP: ${{ github.workspace }}\examples\${{ matrix.example }}\.tmp
         run: |
-          New-Item -ItemType Directory -Force -Path 'examples/.tmp' | Out-Null
-          & "$PWD\node_modules\.bin\leia.cmd" "examples/${{ matrix.example }}/README.md" --shell pwsh -c "Destroy tests" --stdin
+          New-Item -ItemType Directory -Force -Path $env:TMPDIR | Out-Null
+          bun run leia "examples/${{ matrix.example }}/README.md" --shell pwsh -c "Destroy tests" --stdin

@@ -48,8 +48,10 @@ jobs:
         shell: bash
         run: echo "$PWD/dist" >> "$GITHUB_PATH"
 
-      - name: Run Leia-backed example
+      - name: Verify example ${{ matrix.example }} with Leia
         shell: bash
+        env:
+          TMPDIR: ${{ github.workspace }}/examples/${{ matrix.example }}/.tmp
         run: |
-          mkdir -p examples/.tmp
-          TMPDIR="$PWD/examples/.tmp" ./node_modules/.bin/leia "examples/${{ matrix.example }}/README.md" -c "Destroy tests" --stdin
+          mkdir -p "$TMPDIR"
+          bun run leia "examples/${{ matrix.example }}/README.md" -c "Destroy tests" --stdin

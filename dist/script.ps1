@@ -160,7 +160,7 @@ function Write-Status {
   )
 
   $text = Expand-Message -Message $Message -MessageArgs $MessageArgs
-  Write-Host ('{0}: {1}' -f (& $Colorizer $Label), $text)
+  Write-Information ('{0}: {1}' -f (& $Colorizer $Label), $text) -InformationAction Continue
 }
 
 function debug {
@@ -196,8 +196,7 @@ function note {
 
 function fail {
   param(
-    [string]$Message,
-    [int]$ExitCode = 1
+    [string]$Message
   )
 
   $text = Expand-Message -Message $Message
