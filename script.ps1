@@ -17,8 +17,8 @@ $env:DEBUG = '1'
 
 Run `./script.ps1 -Help` for more advanced usage.
 #>
+[CmdletBinding()]
 param(
-  [switch]$Debug,
   [switch]$Help,
   [switch]$Version,
 
@@ -34,6 +34,7 @@ $CLI_NAME = if ($PSCommandPath) { Split-Path -Leaf $PSCommandPath } else { $MyIn
 $SCRIPT_VERSION = if (-not [string]::IsNullOrWhiteSpace($env:SCRIPT_VERSION)) { $env:SCRIPT_VERSION } else { try { $resolved = (& git describe --tags --always --abbrev=1 2>$null | Out-String).Trim(); if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($resolved)) { $resolved } else { '0.0.0-dev' } } catch { '0.0.0-dev' } }
 $ESCAPE = [char]27
 $USE_COLOR = $false
+$script:DebugEnabled = $false
 
 function Test-Truthy {
   param([AllowNull()][object]$Value)
@@ -51,6 +52,21 @@ function Test-Truthy {
     'off' { return $false }
     default { return $true }
   }
+}
+
+# Normalize debug preference using the common -Debug parameter plus env fallbacks.
+$DebugPreference = if (
+  $PSBoundParameters.ContainsKey('Debug') -or
+  (Test-Truthy $env:DEBUG) -or
+  (Test-Truthy $env:RUNNER_DEBUG)
+) {
+  'Continue'
+} else {
+  $DebugPreference
+}
+
+if ($DebugPreference -eq 'Inquire' -or $DebugPreference -eq 'Continue') {
+  $script:DebugEnabled = $true
 }
 
 function Test-ColorEnabled {
@@ -170,7 +186,7 @@ function debug {
     [object[]]$MessageArgs = @()
   )
 
-  if (-not $script:Resolved.Debug) {
+  if (-not $script:DebugEnabled) {
     return
   }
 
@@ -195,19 +211,6 @@ function fail {
 
   Write-StatusLine -Stream 'stderr' -Label 'error' -Colorizer ${function:red} -Message $Message
   throw ([System.Exception]::new(('exit {0}: {1}' -f $ExitCode, $Message)))
-}
-
-function Resolve-Debug {
-  param(
-    [bool]$CliDebug,
-    [bool]$DebugProvided
-  )
-
-  if ($DebugProvided) {
-    return $CliDebug
-  }
-
-  return (Test-Truthy $env:DEBUG) -or (Test-Truthy $env:RUNNER_DEBUG)
 }
 
 function Show-Version {
@@ -247,10 +250,9 @@ function Invoke-RunCli {
 }
 
 $script:USE_COLOR = Test-ColorEnabled
-$rawDebug = [bool]$Debug
 
 $script:Resolved = [pscustomobject]@{
-  Debug = Resolve-Debug -CliDebug $rawDebug -DebugProvided $PSBoundParameters.ContainsKey('Debug')
+  Debug = $script:DebugEnabled
   Positionals = @($Positionals)
 }
 

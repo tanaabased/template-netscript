@@ -37,7 +37,10 @@ jobs:
 
       - name: Verify stamped release entrypoint
         shell: bash
-        run: test "$(./dist/script.sh --version)" = "${{ steps.prepare-release.outputs.resolved-version }}"
+        run: |
+          actual="$(bash ./dist/script.sh --version)"
+          printf 'actual=%s\n' "$actual"
+          test "$actual" = "${{ steps.prepare-release.outputs.resolved-version }}"
 
   release-powershell:
     runs-on: windows-2025
