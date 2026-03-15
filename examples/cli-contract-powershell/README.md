@@ -3,14 +3,6 @@
 This example keeps coverage on the PowerShell-facing contract of `script.ps1`: help output, version
 output, and a clear failure for unexpected positional arguments.
 
-## Setup
-
-```powershell
-# should reset the example scratch directory
-Remove-Item -Recurse -Force .tmp -ErrorAction SilentlyContinue
-New-Item -ItemType Directory -Force -Path .tmp | Out-Null
-```
-
 ## Testing
 
 ```powershell
@@ -25,8 +17,8 @@ $version = script.ps1 -Version
 if ([string]::IsNullOrWhiteSpace($version)) { throw 'expected version output' }
 
 # should fail for an unexpected positional argument
-$stderrPath = Join-Path .tmp 'invalid.err.log'
-$stdoutPath = Join-Path .tmp 'invalid.out.log'
+$stderrPath = 'invalid.err.log'
+$stdoutPath = 'invalid.out.log'
 $succeeded = $true
 try {
   script.ps1 definitely-bogus 1> $stdoutPath 2> $stderrPath
@@ -42,6 +34,6 @@ Get-Content $stderrPath | Select-String -Pattern 'does not accept positional arg
 ## Destroy tests
 
 ```powershell
-# should remove the example scratch directory
-Remove-Item -Recurse -Force .tmp -ErrorAction SilentlyContinue
+# should remove the cli-contract failure logs
+Remove-Item invalid.out.log,invalid.err.log -Force -ErrorAction SilentlyContinue
 ```

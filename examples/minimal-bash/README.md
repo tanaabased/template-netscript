@@ -6,23 +6,20 @@ no-argument flow and verifies the placeholder output from the prepared `dist/scr
 ## Setup
 
 ```bash
-# should reset the example scratch directory
-rm -rf .tmp && mkdir -p .tmp
-
 # should run the default placeholder flow
-script.sh > .tmp/run.log 2>&1
+script.sh > run.log 2>&1
 ```
 
 ## Testing
 
 ```bash
 # should print the placeholder execution message
-grep -F 'Replace the body of script.sh with your project logic.' .tmp/run.log
+grep -F 'Replace the body of script.sh with your project logic.' run.log
 ```
 
 ## Destroy tests
 
 ```bash
-# should remove the example scratch directory
-rm -rf .tmp
+# should remove the placeholder run log
+rm -f run.log
 ```

@@ -6,24 +6,20 @@ no-argument flow and verifies the placeholder output from the prepared `dist/scr
 ## Setup
 
 ```powershell
-# should reset the example scratch directory
-Remove-Item -Recurse -Force .tmp -ErrorAction SilentlyContinue
-New-Item -ItemType Directory -Force -Path .tmp | Out-Null
-
 # should run the default placeholder flow
-script.ps1 *> .tmp/run.log
+script.ps1 *> run.log
 ```
 
 ## Testing
 
 ```powershell
 # should print the placeholder execution message
-Get-Content .tmp/run.log | Select-String -Pattern 'Replace the body of script.ps1 with your project logic.'
+Get-Content run.log | Select-String -Pattern 'Replace the body of script.ps1 with your project logic.'
 ```
 
 ## Destroy tests
 
 ```powershell
-# should remove the example scratch directory
-Remove-Item -Recurse -Force .tmp -ErrorAction SilentlyContinue
+# should remove the placeholder run log
+Remove-Item run.log -Force -ErrorAction SilentlyContinue
 ```
