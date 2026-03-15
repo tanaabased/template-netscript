@@ -223,30 +223,16 @@ function Show-Usage {
     '  -Help     show this help message'
     ''
     'This starter intentionally has no product logic yet.'
+    'Additional arguments are ignored by the starter until you replace the placeholder logic.'
     ('Replace the body of {0} with your project behavior.' -f $script:CLI_NAME)
   )
 
   Write-Output ($lines -join [Environment]::NewLine)
 }
 
-function Normalize-Positionals {
-  param(
-    [string[]]$Arguments = @()
-  )
-
-  $resolved = @($Arguments)
-  if ($resolved.Count -eq 1 -and $resolved[0] -eq '.') {
-    debug 'ignoring lone PowerShell wrapper positional "."'
-    return @()
-  }
-
-  return $resolved
-}
-
 function Invoke-RunCli {
   if ($script:Resolved.Positionals.Count -gt 0) {
-    $joined = ($script:Resolved.Positionals -join ' ')
-    fail ('This starter does not accept positional arguments yet: {0}.' -f (bold $joined))
+    debug 'ignoring starter positional arguments: {0}' ($script:Resolved.Positionals -join ' ')
   }
 
   debug 'running placeholder command body'
@@ -257,7 +243,7 @@ $script:USE_COLOR = Test-ColorEnabled
 
 $script:Resolved = [pscustomobject]@{
   Debug = $script:DebugEnabled
-  Positionals = @(Normalize-Positionals -Arguments $Positionals)
+  Positionals = @($Positionals)
 }
 
 if ($Help) {

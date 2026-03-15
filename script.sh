@@ -96,7 +96,7 @@ usage() {
   fi
 
   cat <<EOF
-Usage: ${tty_bold}${CLI_NAME}${tty_reset} ${tty_dim}[options]${tty_reset}
+Usage: ${tty_bold}${CLI_NAME}${tty_reset} ${tty_dim}[options] [arguments...]${tty_reset}
 
 ${tty_tp}Options:${tty_reset}
   --debug     enable debug logging ${tty_dim}[default: ${debug_display}]${tty_reset}
@@ -104,6 +104,7 @@ ${tty_tp}Options:${tty_reset}
   -h, --help  show this help message
 
 This starter intentionally has no product logic yet.
+Additional arguments are ignored by the starter until you replace the placeholder logic.
 Replace the body of ${CLI_NAME} with your project behavior.
 EOF
 }
@@ -135,13 +136,13 @@ main() {
         fail "Unrecognized option ${tty_bold}$1${tty_reset}. Run ${tty_ts}${CLI_NAME} --help${tty_reset} for usage."
         ;;
       *)
-        fail "This starter does not accept positional arguments yet: ${tty_bold}$1${tty_reset}."
+        break
         ;;
     esac
   done
 
   if [[ $# -gt 0 ]]; then
-    fail 'This starter does not accept positional arguments yet.'
+    debug_log 'ignoring starter positional arguments:' "$@"
   fi
 
   debug_log 'running placeholder command body'
