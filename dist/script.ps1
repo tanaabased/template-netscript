@@ -229,6 +229,20 @@ function Show-Usage {
   Write-Output ($lines -join [Environment]::NewLine)
 }
 
+function Normalize-Positionals {
+  param(
+    [string[]]$Arguments = @()
+  )
+
+  $resolved = @($Arguments)
+  if ($resolved.Count -eq 1 -and $resolved[0] -eq '.') {
+    debug 'ignoring lone PowerShell wrapper positional "."'
+    return @()
+  }
+
+  return $resolved
+}
+
 function Invoke-RunCli {
   if ($script:Resolved.Positionals.Count -gt 0) {
     $joined = ($script:Resolved.Positionals -join ' ')
@@ -243,7 +257,7 @@ $script:USE_COLOR = Test-ColorEnabled
 
 $script:Resolved = [pscustomobject]@{
   Debug = $script:DebugEnabled
-  Positionals = @($Positionals)
+  Positionals = @(Normalize-Positionals -Arguments $Positionals)
 }
 
 if ($Help) {
