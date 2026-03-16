@@ -29,7 +29,19 @@ param(
 Set-StrictMode -Version 3
 $ErrorActionPreference = 'Stop'
 
-$CLI_NAME = if ($PSCommandPath) { Split-Path -Leaf $PSCommandPath } else { $MyInvocation.MyCommand.Name }
+$CLI_NAME = if (
+  -not [string]::IsNullOrWhiteSpace($MyInvocation.InvocationName) -and
+  $MyInvocation.InvocationName -notin @('.', '&') -and
+  $MyInvocation.InvocationName -notmatch '^(?:pwsh|powershell)(?:\.exe)?$'
+) {
+  Split-Path -Leaf $MyInvocation.InvocationName
+} elseif ($PSCommandPath) {
+  Split-Path -Leaf $PSCommandPath
+} elseif ($MyInvocation.MyCommand.Name) {
+  $MyInvocation.MyCommand.Name
+} else {
+  'script.ps1'
+}
 # Keep a single top-level assignment so release automation can stamp the entrypoint in place.
 $SCRIPT_VERSION = if (-not [string]::IsNullOrWhiteSpace($env:SCRIPT_VERSION)) { $env:SCRIPT_VERSION } else { try { $resolved = (& git describe --tags --always --abbrev=1 2>$null | Out-String).Trim(); if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($resolved)) { $resolved } else { '0.0.0-dev' } } catch { '0.0.0-dev' } }
 $ESCAPE = [char]27
