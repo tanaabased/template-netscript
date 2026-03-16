@@ -29,9 +29,21 @@ param(
 Set-StrictMode -Version 3
 $ErrorActionPreference = 'Stop'
 
-$CLI_NAME = if ($PSCommandPath) { Split-Path -Leaf $PSCommandPath } else { $MyInvocation.MyCommand.Name }
+$CLI_NAME = if (
+  -not [string]::IsNullOrWhiteSpace($MyInvocation.InvocationName) -and
+  $MyInvocation.InvocationName -notin @('.', '&') -and
+  $MyInvocation.InvocationName -notmatch '^(?:pwsh|powershell)(?:\.exe)?$'
+) {
+  Split-Path -Leaf $MyInvocation.InvocationName
+} elseif ($PSCommandPath) {
+  Split-Path -Leaf $PSCommandPath
+} elseif ($MyInvocation.MyCommand.Name) {
+  $MyInvocation.MyCommand.Name
+} else {
+  'script.ps1'
+}
 # Keep a single top-level assignment so release automation can stamp the entrypoint in place.
-$SCRIPT_VERSION = "v1.0.0-beta.1"
+$SCRIPT_VERSION = "v1.0.0-beta.2"
 $ESCAPE = [char]27
 $USE_COLOR = $false
 $script:DebugEnabled = $false

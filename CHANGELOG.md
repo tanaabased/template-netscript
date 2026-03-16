@@ -1,5 +1,7 @@
 ## {{ UNRELEASED_VERSION }} - [{{ UNRELEASED_DATE }}]({{ UNRELEASED_LINK }})
 
+## v1.0.0-beta.2 - [March 16, 2026](https://github.com/tanaabased/template-netscript/releases/tag/v1.0.0-beta.2)
+
 - Updated `leia` tests in `examples` to use `script` alias to better simulate actual `PATH` based installation
 - Updated boilerplates to be `SCRIPTNAME` dynamic
 
