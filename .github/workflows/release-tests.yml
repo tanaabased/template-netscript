@@ -43,6 +43,8 @@ jobs:
           actual="$(bash ./dist/script.sh --version)"
           printf 'actual=%s\n' "$actual"
           test "$actual" = "${{ env.STAMPED_VERSION }}"
+          help_output="$(bash ./dist/script.sh --help)"
+          printf '%s\n' "$help_output" | grep -E 'Usage: .*script\.sh '
 
   release-powershell:
     runs-on: windows-2025
@@ -76,4 +78,8 @@ jobs:
           $version = & ./dist/script.ps1 -Version
           if ($version -ne "${{ env.STAMPED_VERSION }}") {
             throw "expected version ${{ env.STAMPED_VERSION }}, got $version"
+          }
+          $help = & ./dist/script.ps1 -Help
+          if (-not ($help | Select-String -Pattern 'Usage: .*script\.ps1 ' -Quiet)) {
+            throw 'expected help output to mention script.ps1'
           }

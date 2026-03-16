@@ -44,6 +44,10 @@ jobs:
             version-injector dist/script.sh --style sh --version "${{ env.STAMPED_VERSION }}"
             version-injector dist/script.ps1 --style ps1 --version "${{ env.STAMPED_VERSION }}"
 
+      - name: Create script alias for Leia examples
+        shell: bash
+        run: ln -sf script.sh dist/script
+
       - name: Put prepared script on PATH
         shell: bash
         run: echo "$PWD/dist" >> "$GITHUB_PATH"
