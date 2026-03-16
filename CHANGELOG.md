@@ -1,5 +1,8 @@
 ## {{ UNRELEASED_VERSION }} - [{{ UNRELEASED_DATE }}]({{ UNRELEASED_LINK }})
 
+- Updated `leia` tests in `examples` to use `script` alias to better simulate actual `PATH` based installation
+- Updated boilerplates to be `SCRIPTNAME` dynamic
+
 ## v1.0.0-beta.1 - [March 15, 2026](https://github.com/tanaabased/template-netscript/releases/tag/v1.0.0-beta.1)
 
 - Added [TEMPLATE-SETUP.md](./TEMPLATE-SETUP.md) as the agent-driven template adoption and seeding spec, including a copy-paste prompt plus cleanup and changelog-reset rules.
