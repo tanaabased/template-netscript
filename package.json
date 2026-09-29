@@ -1,5 +1,5 @@
 {
-  "name": "@tanaabased/template-netscript",
+  "name": "@tanaab/template-netscript",
   "description": "Minimal hosted Bash and PowerShell script starter template for macOS, Linux, and Windows.",
   "version": "1.0.0-beta.2",
   "author": "Mike Pirog @pirog",
