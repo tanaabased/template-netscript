@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "template-netscript",
+      "name": "@tanaab/template-netscript",
       "devDependencies": {
         "@eslint/js": "^10.0.1",
         "@lando/leia": "^2.0.0",

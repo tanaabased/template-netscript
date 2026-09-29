@@ -138,7 +138,7 @@ Replace all template identity placeholders too:
 - `script.tanaab.sh`
 - `script.sh`
 - `script.ps1`
-- `@tanaabased/template-netscript`
+- `@tanaab/template-netscript`
 - `tanaabased/template-netscript`
 
 If the new repo will publish a real package later, also update the package name, description,
